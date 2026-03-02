@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ParcelApp",
+        "description": "Enter your ParcelApp API settings.",
+        "data": {
+          "api_key": "API key",
+          "filter_mode": "Delivery filter",
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid API key",
+      "cannot_connect": "Failed to connect to ParcelApp API"
+    },
+    "abort": {
+      "single_instance_allowed": "Only one ParcelApp configuration is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ParcelApp options",
+        "data": {
+          "filter_mode": "Delivery filter",
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "domain": "parcelapp",
+  "name": "ParcelApp Deliveries",
+  "version": "0.2.0",
+  "documentation": "https://parcelapp.net/help/api-view-deliveries.html",
+  "issue_tracker": "https://parcelapp.net/help/",
+  "codeowners": [],
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "config_flow": true,
+  "single_config_entry": true
+}
