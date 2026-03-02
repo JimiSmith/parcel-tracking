@@ -104,6 +104,7 @@ class ParcelSummarySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], Sen
         calculator: Callable[[list[dict[str, Any]]], int],
     ) -> None:
         super().__init__(coordinator)
+        self._sensor_key = sensor_key
         self._calculator = calculator
         self._attr_name = f"ParcelApp {name}"
         self._attr_unique_id = f"{entry_id}_{sensor_key}"
@@ -113,6 +114,14 @@ class ParcelSummarySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], Sen
     def native_value(self) -> int:
         """Return the sensor value."""
         return self._calculator(_get_deliveries(self.coordinator))
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return extra attributes for dashboard filtering."""
+        return {
+            "parcelapp_summary": True,
+            "parcelapp_summary_type": self._sensor_key,
+        }
 
 
 class ParcelDeliverySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], SensorEntity):
@@ -167,6 +176,7 @@ class ParcelDeliverySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], Se
         latest_event = events[0] if events else {}
 
         return {
+            "parcelapp_delivery": True,
             "carrier_code": delivery.get("carrier_code"),
             "tracking_number": delivery.get("tracking_number"),
             "description": delivery.get("description"),

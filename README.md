@@ -29,6 +29,45 @@ A Home Assistant custom integration for tracking ParcelApp deliveries through HA
   - `ParcelApp Exceptions`
 - One per-delivery sensor per tracking number with status as state and detailed attributes.
 
+## Dynamic dashboard (Auto-Entities)
+
+Install **Auto-Entities** from HACS (Frontend), then add a manual card with:
+
+```yaml
+type: custom:auto-entities
+card:
+  type: entities
+  title: ParcelApp Deliveries
+show_empty: false
+sort:
+  method: attribute
+  attribute: timestamp_expected
+  numeric: true
+filter:
+  include:
+    - domain: sensor
+      attributes:
+        parcelapp_delivery: true
+  exclude:
+    - state: unavailable
+```
+
+Optional dynamic cards:
+
+```yaml
+type: custom:auto-entities
+card:
+  type: entities
+  title: ParcelApp Exceptions
+show_empty: false
+filter:
+  include:
+    - domain: sensor
+      attributes:
+        parcelapp_delivery: true
+        status_code: 7
+```
+
 ## API notes
 
 - Endpoint: `https://api.parcel.app/external/deliveries/`

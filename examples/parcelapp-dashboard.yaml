@@ -1,0 +1,40 @@
+title: ParcelApp
+views:
+  - title: Deliveries
+    path: deliveries
+    cards:
+      - type: entities
+        title: ParcelApp Summary
+        entities:
+          - entity: sensor.parcelapp_deliveries
+          - entity: sensor.parcelapp_out_for_delivery
+          - entity: sensor.parcelapp_exceptions
+
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: Active Deliveries
+        show_empty: false
+        sort:
+          method: attribute
+          attribute: timestamp_expected
+          numeric: true
+        filter:
+          include:
+            - domain: sensor
+              attributes:
+                parcelapp_delivery: true
+          exclude:
+            - state: unavailable
+
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: Delivery Exceptions
+        show_empty: false
+        filter:
+          include:
+            - domain: sensor
+              attributes:
+                parcelapp_delivery: true
+                status_code: 7
