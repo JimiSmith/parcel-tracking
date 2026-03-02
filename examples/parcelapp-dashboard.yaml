@@ -1,40 +1,97 @@
-title: ParcelApp
 views:
-  - title: Deliveries
-    path: deliveries
-    cards:
-      - type: entities
-        title: ParcelApp Summary
-        entities:
-          - entity: sensor.parcelapp_deliveries
-          - entity: sensor.parcelapp_out_for_delivery
-          - entity: sensor.parcelapp_exceptions
+  - type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:auto-entities
+            card:
+              type: entities
+              title: Active Deliveries
+            show_empty: false
+            sort:
+              method: attribute
+              attribute: timestamp_expected
+              numeric: true
+            filter:
+              include:
+                - domain: sensor
+                  attributes:
+                    parcelapp_delivery: true
+              exclude:
+                - state: unavailable
+          - type: custom:auto-entities
+            card:
+              type: entities
+              title: Delivery Exceptions
+            show_empty: false
+            filter:
+              include:
+                - domain: sensor
+                  attributes:
+                    parcelapp_delivery: true
+                    status_code: 7
+      - type: grid
+        cards:
+          - type: markdown
+            content: >-
+              {% set ns = namespace(deliveries=[]) %}
 
-      - type: custom:auto-entities
-        card:
-          type: entities
-          title: Active Deliveries
-        show_empty: false
-        sort:
-          method: attribute
-          attribute: timestamp_expected
-          numeric: true
-        filter:
-          include:
-            - domain: sensor
-              attributes:
-                parcelapp_delivery: true
-          exclude:
-            - state: unavailable
+              {% for s in states.sensor %}
+                {% if state_attr(s.entity_id, 'parcelapp_delivery') %}
+                  {% set ns.deliveries = ns.deliveries + [s] %}
+                {% endif %}
+              {% endfor %}
 
-      - type: custom:auto-entities
-        card:
-          type: entities
-          title: Delivery Exceptions
-        show_empty: false
-        filter:
-          include:
-            - domain: sensor
-              attributes:
-                parcelapp_delivery: true
-                status_code: 7
+              {% if ns.deliveries | count == 0 %}
+
+              No delivery events yet.
+
+              {% else %}
+
+              {% for s in ns.deliveries | sort(attribute='name') %}
+
+              ## {{ s.name }}
+
+              {% set events = state_attr(s.entity_id, 'events') or [] %}
+
+              {% if events | count == 0 %}
+
+              _No events yet._
+
+              {% else %}
+
+              {% for e in events %}
+
+              - {{ e.get('date') or 'No date' }} — **{{ e.get('event') or 'No
+              event' }}**{% if e.get('location') %} ({{ e.get('location') }}){%
+              endif %}
+
+              {% endfor %}
+
+              {% endif %}
+
+              {% if not loop.last %}
+
+              ---
+
+              {% endif %}
+
+              {% endfor %}
+
+              {% endif %}
+            grid_options:
+              columns: full
+              rows: auto
+        column_span: 2
+    header:
+      card:
+        type: markdown
+        text_only: true
+        content: Deliveries
+    badges:
+      - type: entity
+        entity: sensor.parcelapp_deliveries
+      - type: entity
+        entity: sensor.parcelapp_out_for_delivery
+      - type: entity
+        entity: sensor.parcelapp_exceptions
