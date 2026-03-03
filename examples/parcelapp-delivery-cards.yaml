@@ -1,0 +1,38 @@
+views:
+  - title: Parcel Deliveries
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:auto-entities
+            card:
+              type: entities
+              title: Summary
+            filter:
+              include:
+                - entity_id: sensor.parcelapp_deliveries
+                - entity_id: sensor.parcelapp_out_for_delivery
+                - entity_id: sensor.parcelapp_exceptions
+          - type: custom:auto-entities
+            card:
+              type: grid
+              title: Active Deliveries
+              square: false
+              columns: 1
+            card_param: cards
+            sort:
+              method: attribute
+              attribute: timestamp_expected
+              numeric: true
+            filter:
+              include:
+                - domain: sensor
+                  attributes:
+                    parcelapp_delivery: true
+                  options:
+                    type: custom:parcelapp-delivery-card
+                    events_limit: 5
+                    show_expected: true
+                    show_carrier: true
+              exclude:
+                - state: unavailable

@@ -29,9 +29,43 @@ A Home Assistant custom integration for tracking ParcelApp deliveries through HA
   - `ParcelApp Exceptions`
 - One per-delivery sensor per tracking number with status as state and detailed attributes.
 
-## Dynamic dashboard (Auto-Entities)
+## Dashboard examples
 
-Install **Auto-Entities** from HACS (Frontend), then use the dashboard example from `examples/parcelapp-dashboard.yaml`.
+Install **Auto-Entities** from HACS (Frontend), then use one of:
+
+- `examples/parcelapp-dashboard.yaml` (classic entities + markdown events)
+- `examples/parcelapp-delivery-cards.yaml` (screenshot-style custom delivery cards)
+
+## Custom delivery card
+
+This integration ships a Lovelace custom card:
+
+- Type: `custom:parcelapp-delivery-card`
+- Resource: auto-registered by the integration on startup
+
+If your Home Assistant version does not auto-load it, add this Dashboard resource manually:
+
+- URL: `/parcelapp_frontend/parcelapp-delivery-card.js`
+- Type: `JavaScript Module`
+
+### Card options
+
+- `entity` (required): ParcelApp delivery sensor (for example `sensor.parcelapp_ups_...`)
+- `title` (optional): override title text
+- `events_limit` (optional, default `5`): number of events to show
+- `show_expected` (optional, default `true`): show expected delivery window
+- `show_carrier` (optional, default `true`): include carrier in title
+- `collapsible_events` (optional, default `false`): show all events in expandable block
+
+### Example card
+
+```yaml
+type: custom:parcelapp-delivery-card
+entity: sensor.parcelapp_ups_1z123456789
+events_limit: 5
+show_expected: true
+show_carrier: true
+```
 
 ## Delivery event attributes
 
@@ -43,111 +77,6 @@ Each per-delivery sensor exposes:
 - `events` (full event list from ParcelApp)
 
 You can inspect these in **Developer Tools → States** on any `sensor.parcelapp_*` delivery entity.
-
-The current example dashboard uses one **sections** view with:
-- header + summary badges
-- Active Deliveries + Delivery Exceptions auto-entity cards
-- a full-width events-by-parcel markdown section
-
-```yaml
-views:
-  - type: sections
-    sections:
-      - type: grid
-        cards:
-          - type: custom:auto-entities
-            card:
-              type: entities
-              title: Active Deliveries
-            show_empty: false
-            sort:
-              method: attribute
-              attribute: timestamp_expected
-              numeric: true
-            filter:
-              include:
-                - domain: sensor
-                  attributes:
-                    parcelapp_delivery: true
-              exclude:
-                - state: unavailable
-          - type: custom:auto-entities
-            card:
-              type: entities
-              title: Delivery Exceptions
-            show_empty: false
-            filter:
-              include:
-                - domain: sensor
-                  attributes:
-                    parcelapp_delivery: true
-                    status_code: 7
-      - type: grid
-        cards:
-          - type: markdown
-            content: >-
-              {% set ns = namespace(deliveries=[]) %}
-
-              {% for s in states.sensor %}
-                {% if state_attr(s.entity_id, 'parcelapp_delivery') %}
-                  {% set ns.deliveries = ns.deliveries + [s] %}
-                {% endif %}
-              {% endfor %}
-
-              {% if ns.deliveries | count == 0 %}
-
-              No delivery events yet.
-
-              {% else %}
-
-              {% for s in ns.deliveries | sort(attribute='name') %}
-
-              ## {{ s.name }}
-
-              {% set events = state_attr(s.entity_id, 'events') or [] %}
-
-              {% if events | count == 0 %}
-
-              _No events yet._
-
-              {% else %}
-
-              {% for e in events %}
-
-              - {{ e.get('date') or 'No date' }} — **{{ e.get('event') or 'No
-              event' }}**{% if e.get('location') %} ({{ e.get('location') }}){%
-              endif %}
-
-              {% endfor %}
-
-              {% endif %}
-
-              {% if not loop.last %}
-
-              ---
-
-              {% endif %}
-
-              {% endfor %}
-
-              {% endif %}
-            grid_options:
-              columns: full
-              rows: auto
-        column_span: 2
-    header:
-      card:
-        type: markdown
-        text_only: true
-        content: Deliveries
-    badges:
-      - type: entity
-        entity: sensor.parcelapp_deliveries
-      - type: entity
-        entity: sensor.parcelapp_out_for_delivery
-      - type: entity
-        entity: sensor.parcelapp_exceptions
-```
 
 ## API notes
 
