@@ -6,15 +6,6 @@ views:
         cards:
           - type: custom:auto-entities
             card:
-              type: entities
-              title: Summary
-            filter:
-              include:
-                - entity_id: sensor.parcelapp_deliveries
-                - entity_id: sensor.parcelapp_out_for_delivery
-                - entity_id: sensor.parcelapp_exceptions
-          - type: custom:auto-entities
-            card:
               type: grid
               title: Active Deliveries
               square: false
@@ -26,13 +17,27 @@ views:
               numeric: true
             filter:
               include:
-                - domain: sensor
-                  attributes:
-                    parcelapp_delivery: true
-                  options:
+                - options:
                     type: custom:parcelapp-delivery-card
-                    events_limit: 5
+                    events_limit: 3
                     show_expected: true
                     show_carrier: true
+                  domain: sensor
+                  attributes:
+                    parcelapp_delivery: true
+                  sort:
+                    method: attribute
+                    attribute: date_expected
               exclude:
-                - state: unavailable
+                - options: {}
+                  state: unavailable
+            grid_options:
+              columns: full
+        column_span: 3
+    badges:
+      - type: entity
+        entity: sensor.parcelapp_deliveries
+      - type: entity
+        entity: sensor.parcelapp_exceptions
+      - type: entity
+        entity: sensor.parcelapp_out_for_delivery

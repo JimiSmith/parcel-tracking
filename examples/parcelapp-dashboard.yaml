@@ -10,8 +10,7 @@ views:
             show_empty: false
             sort:
               method: attribute
-              attribute: timestamp_expected
-              numeric: true
+              attribute: date_expected
             filter:
               include:
                 - domain: sensor
