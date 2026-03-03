@@ -79,6 +79,23 @@ show_decorations: true
 action: more-info
 ```
 
+When using this card via `custom:auto-entities`, pass the generated entity explicitly:
+
+```yaml
+type: custom:auto-entities
+card:
+  type: grid
+card_param: cards
+filter:
+  include:
+    - domain: sensor
+      attributes:
+        parcelapp_delivery: true
+      options:
+        type: custom:parcelapp-delivery-card
+        entity: this.entity_id
+```
+
 ## Delivery event attributes
 
 Each per-delivery sensor exposes:

@@ -19,6 +19,7 @@ views:
               include:
                 - options:
                     type: custom:parcelapp-delivery-card
+                    entity: this.entity_id
                     layout: hero
                     events_limit: 4
                     show_expected: true
