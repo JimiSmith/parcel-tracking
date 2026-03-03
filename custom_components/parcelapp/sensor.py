@@ -253,8 +253,8 @@ def _parcelapp_device_info(entry_id: str) -> DeviceInfo:
     """Return Home Assistant device metadata for ParcelApp entities."""
     return DeviceInfo(
         identifiers={(DOMAIN, entry_id)},
-        name="ParcelApp",
-        manufacturer="ParcelApp",
+        name="ParcelApp Deliveries",
+        manufacturer="James Smith",
         entry_type=DeviceEntryType.SERVICE,
     )
 

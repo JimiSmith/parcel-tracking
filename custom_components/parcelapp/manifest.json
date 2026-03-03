@@ -1,7 +1,7 @@
 {
   "domain": "parcelapp",
   "name": "ParcelApp Deliveries",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "documentation": "https://github.com/JimiSmith/parcel-tracking",
   "issue_tracker": "https://github.com/JimiSmith/parcel-tracking/issues",
   "codeowners": [],
