@@ -22,6 +22,11 @@ class ParcelAppDeliveryCard extends HTMLElement {
     if (!this._card) {
       this._card = document.createElement("ha-card");
       this._card.className = "parcelapp-delivery-card";
+      this._card.style.background = "transparent";
+      this._card.style.boxShadow = "none";
+      this._card.style.border = "none";
+      this._card.style.padding = "0";
+      this._card.style.overflow = "visible";
       this.appendChild(this._card);
     }
   }
@@ -304,8 +309,8 @@ class ParcelAppDeliveryCard extends HTMLElement {
           content: "";
           position: absolute;
           left: 6px;
-          top: 8px;
-          bottom: 8px;
+          top: 0.72em;
+          bottom: 0.72em;
           width: 2px;
           background: rgba(99, 184, 255, 0.55);
         }
@@ -320,7 +325,7 @@ class ParcelAppDeliveryCard extends HTMLElement {
           content: "";
           position: absolute;
           left: 6px;
-          top: 0.43em;
+          top: 0.72em;
           transform: translate(-50%, -50%);
           width: 8px;
           height: 8px;
