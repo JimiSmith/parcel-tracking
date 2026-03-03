@@ -3,16 +3,27 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import logging
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, STATUS_LABELS
 from .coordinator import ParcelAppDataUpdateCoordinator
+
+_LOGGER = logging.getLogger(__name__)
+
+SUMMARY_SENSOR_KEYS: set[str] = {
+    "deliveries_count",
+    "out_for_delivery_count",
+    "exception_count",
+}
 
 
 async def async_setup_entry(
@@ -62,6 +73,7 @@ async def async_setup_entry(
     def _sync_delivery_entities() -> None:
         deliveries = _get_deliveries(coordinator)
         current_keys: set[str] = set()
+        current_unique_ids: set[str] = set()
         new_entities: list[SensorEntity] = []
 
         for delivery in deliveries:
@@ -70,6 +82,7 @@ async def async_setup_entry(
                 continue
 
             current_keys.add(delivery_key)
+            current_unique_ids.add(f"{entry.entry_id}_{delivery_key}")
             if delivery_key in delivery_entities:
                 continue
 
@@ -81,6 +94,20 @@ async def async_setup_entry(
         for delivery_key in removed:
             entity = delivery_entities.pop(delivery_key)
             hass.async_create_task(entity.async_remove())
+
+        stale_registry_count = _remove_stale_registry_delivery_entities(
+            hass,
+            entry,
+            current_unique_ids,
+        )
+
+        if new_entities or removed or stale_registry_count:
+            _LOGGER.debug(
+                "Delivery entity sync: created=%s removed_runtime=%s removed_registry=%s",
+                len(new_entities),
+                len(removed),
+                stale_registry_count,
+            )
 
         if new_entities:
             async_add_entities(new_entities)
@@ -109,6 +136,7 @@ class ParcelSummarySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], Sen
         self._attr_name = f"ParcelApp {name}"
         self._attr_unique_id = f"{entry_id}_{sensor_key}"
         self._attr_icon = icon
+        self._attr_device_info = _parcelapp_device_info(entry_id)
 
     @property
     def native_value(self) -> int:
@@ -137,6 +165,7 @@ class ParcelDeliverySensor(CoordinatorEntity[ParcelAppDataUpdateCoordinator], Se
         self._delivery_key = delivery_key
         self._attr_unique_id = f"{entry_id}_{delivery_key}"
         self._attr_icon = "mdi:package-variant-closed"
+        self._attr_device_info = _parcelapp_device_info(entry_id)
 
     @property
     def name(self) -> str:
@@ -218,3 +247,45 @@ def _delivery_key(delivery: dict[str, Any]) -> str | None:
     carrier_code = delivery.get("carrier_code")
     carrier = carrier_code if isinstance(carrier_code, str) else "unknown"
     return f"{carrier}:{tracking_number}"
+
+
+def _parcelapp_device_info(entry_id: str) -> DeviceInfo:
+    """Return Home Assistant device metadata for ParcelApp entities."""
+    return DeviceInfo(
+        identifiers={(DOMAIN, entry_id)},
+        name="ParcelApp",
+        manufacturer="ParcelApp",
+        entry_type=DeviceEntryType.SERVICE,
+    )
+
+
+def _remove_stale_registry_delivery_entities(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    current_unique_ids: set[str],
+) -> int:
+    """Remove stale delivery entities from the entity registry."""
+    entity_registry = er.async_get(hass)
+    entries = er.async_entries_for_config_entry(entity_registry, entry.entry_id)
+    prefix = f"{entry.entry_id}_"
+    removed = 0
+
+    for registry_entry in entries:
+        if registry_entry.domain != "sensor":
+            continue
+
+        unique_id = registry_entry.unique_id
+        if not unique_id.startswith(prefix):
+            continue
+
+        sensor_key = unique_id[len(prefix) :]
+        if sensor_key in SUMMARY_SENSOR_KEYS:
+            continue
+
+        if unique_id in current_unique_ids:
+            continue
+
+        entity_registry.async_remove(registry_entry.entity_id)
+        removed += 1
+
+    return removed
