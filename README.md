@@ -56,15 +56,27 @@ If your Home Assistant version does not auto-load it, add this Dashboard resourc
 - `show_expected` (optional, default `true`): show expected delivery window
 - `show_carrier` (optional, default `true`): include carrier in title
 - `collapsible_events` (optional, default `false`): show all events in expandable block
+- `layout` (optional, default `hero`): `hero` or `compact`
+- `show_decorations` (optional, default `true`): map/package/icon visual layer
+- `show_progress_rail` (optional, default `true`): left-side shipment stage rail
+- `show_route` (optional, default `true`): origin to destination text line
+- `action` (optional, default `more-info`): click behavior (`more-info`)
+- `accent_color` (optional): custom highlight color
+- `card_height` (optional): CSS size value for minimum card height
 
 ### Example card
 
 ```yaml
 type: custom:parcelapp-delivery-card
 entity: sensor.parcelapp_ups_1z123456789
-events_limit: 5
+layout: hero
+events_limit: 4
 show_expected: true
 show_carrier: true
+show_progress_rail: true
+show_route: true
+show_decorations: true
+action: more-info
 ```
 
 ## Delivery event attributes

@@ -19,9 +19,14 @@ views:
               include:
                 - options:
                     type: custom:parcelapp-delivery-card
-                    events_limit: 3
+                    layout: hero
+                    events_limit: 4
                     show_expected: true
                     show_carrier: true
+                    show_progress_rail: true
+                    show_route: true
+                    show_decorations: true
+                    action: more-info
                   domain: sensor
                   attributes:
                     parcelapp_delivery: true
