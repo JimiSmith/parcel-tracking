@@ -139,19 +139,24 @@ class ParcelAppDeliveryCard extends HTMLElement {
           margin-bottom: 16px;
         }
         .carrier-badge {
-          width: 34px;
+          min-width: 34px;
+          max-width: 120px;
           height: 34px;
           border-radius: 9px;
+          padding: 0 10px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           font-weight: 800;
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           letter-spacing: 0.03em;
           text-transform: uppercase;
           color: #ffd96a;
           background: linear-gradient(140deg, rgba(24, 32, 52, 0.9), rgba(12, 18, 32, 0.8));
           border: 1px solid rgba(255, 219, 103, 0.45);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .title-wrap {
           display: flex;
@@ -179,12 +184,25 @@ class ParcelAppDeliveryCard extends HTMLElement {
           font-weight: 600;
         }
         .progress {
+          position: relative;
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 10px;
           margin: 18px 0 18px;
         }
+        .progress::before {
+          content: "";
+          position: absolute;
+          left: 10%;
+          right: 10%;
+          top: 14px;
+          height: 2px;
+          background: rgba(141, 165, 210, 0.4);
+          z-index: 0;
+        }
         .stage {
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -275,25 +293,35 @@ class ParcelAppDeliveryCard extends HTMLElement {
           font-weight: 600;
         }
         .timeline {
+          position: relative;
           margin: 0;
-          padding: 0 0 0 16px;
+          padding: 0;
           list-style: none;
-          border-left: 2px solid rgba(99, 184, 255, 0.55);
           display: grid;
           gap: 10px;
+        }
+        .timeline::before {
+          content: "";
+          position: absolute;
+          left: 6px;
+          top: 8px;
+          bottom: 8px;
+          width: 2px;
+          background: rgba(99, 184, 255, 0.55);
         }
         .timeline li {
           position: relative;
           color: #dce6f8;
           line-height: 1.35;
           font-size: 0.99rem;
-          padding-left: 12px;
+          padding-left: 28px;
         }
         .timeline li::before {
           content: "";
           position: absolute;
-          left: -21px;
+          left: 6px;
           top: 0.43em;
+          transform: translate(-50%, -50%);
           width: 8px;
           height: 8px;
           border-radius: 50%;
@@ -307,8 +335,8 @@ class ParcelAppDeliveryCard extends HTMLElement {
         .timeline-empty {
           color: #8ea0bf;
           border-left: none;
-          margin-left: -16px;
-          padding-left: 0;
+          margin-left: 0;
+          padding-left: 28px;
         }
         .timeline-more summary {
           margin-top: 8px;
