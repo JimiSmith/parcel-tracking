@@ -31,70 +31,16 @@ A Home Assistant custom integration for tracking ParcelApp deliveries through HA
 
 ## Dashboard examples
 
-Install **Auto-Entities** from HACS (Frontend), then use one of:
+Install **Auto-Entities** from HACS (Frontend), then use:
 
-- `examples/parcelapp-dashboard.yaml` (classic entities + markdown events)
-- `examples/parcelapp-delivery-cards.yaml` (screenshot-style custom delivery cards)
+- `examples/parcelapp-dashboard.yaml` (entities + markdown events)
 
-## Custom delivery card
+## Optional frontend card plugin
 
-This integration ships a Lovelace custom card:
+This repository is integration-only.  
+If you want the dedicated custom Lovelace card, install the separate frontend plugin:
 
-- Type: `custom:parcelapp-delivery-card`
-- Resource: auto-registered by the integration on startup
-
-If your Home Assistant version does not auto-load it, add this Dashboard resource manually:
-
-- URL: `/parcelapp_frontend/parcelapp-delivery-card.js`
-- Type: `JavaScript Module`
-
-### Card options
-
-- `entity` (required): ParcelApp delivery sensor (for example `sensor.parcelapp_ups_...`)
-- `title` (optional): override title text
-- `events_limit` (optional, default `5`): number of events to show
-- `show_expected` (optional, default `true`): show expected delivery window
-- `show_carrier` (optional, default `true`): include carrier in title
-- `collapsible_events` (optional, default `false`): show all events in expandable block
-- `layout` (optional, default `hero`): `hero` or `compact`
-- `show_decorations` (optional, default `true`): map/package/icon visual layer
-- `show_progress_rail` (optional, default `true`): left-side shipment stage rail
-- `show_route` (optional, default `true`): origin to destination text line
-- `action` (optional, default `more-info`): click behavior (`more-info`)
-- `accent_color` (optional): custom highlight color
-- `card_height` (optional): CSS size value for minimum card height
-
-### Example card
-
-```yaml
-type: custom:parcelapp-delivery-card
-entity: sensor.parcelapp_ups_1z123456789
-layout: hero
-events_limit: 4
-show_expected: true
-show_carrier: true
-show_progress_rail: true
-show_route: true
-show_decorations: true
-action: more-info
-```
-
-When using this card via `custom:auto-entities`, pass the generated entity explicitly:
-
-```yaml
-type: custom:auto-entities
-card:
-  type: grid
-card_param: cards
-filter:
-  include:
-    - domain: sensor
-      attributes:
-        parcelapp_delivery: true
-      options:
-        type: custom:parcelapp-delivery-card
-        entity: this.entity_id
-```
+- `https://github.com/JimiSmith/parcelapp-lovelace-card`
 
 ## Delivery event attributes
 
