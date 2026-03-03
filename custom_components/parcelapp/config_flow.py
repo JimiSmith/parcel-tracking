@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -80,14 +79,11 @@ class ParcelAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
-        return ParcelAppOptionsFlow(config_entry)
+        return ParcelAppOptionsFlow()
 
 
 class ParcelAppOptionsFlow(config_entries.OptionsFlow):
     """Handle ParcelApp options."""
-
-    def __init__(self, config_entry) -> None:
-        self.config_entry = config_entry
 
     async def async_step_init(self, user_input: dict | None = None):
         """Manage ParcelApp options."""

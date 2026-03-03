@@ -84,3 +84,7 @@ You can inspect these in **Developer Tools → States** on any `sensor.parcelapp
 - Auth header: `api-key`
 - API limit: 20 requests/hour (this integration enforces a minimum polling interval).
 - Responses are cached by ParcelApp.
+
+## Development
+
+For local development setup and test commands, see `CONTRIBUTING.md`.
