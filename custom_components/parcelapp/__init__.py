@@ -17,9 +17,12 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 FRONTEND_CARD_FILE = "parcelapp-delivery-card.js"
 FRONTEND_CARD_STATIC_URL = f"/parcelapp_frontend/{FRONTEND_CARD_FILE}"
 # Bump this token whenever frontend card behavior changes to force browser refresh.
-FRONTEND_CARD_CACHE_TOKEN = "20260303-2"
+FRONTEND_CARD_CACHE_TOKEN = "20260303-3"
 FRONTEND_CARD_RESOURCE_URL = (
     f"{FRONTEND_CARD_STATIC_URL}?v={FRONTEND_CARD_CACHE_TOKEN}"
+)
+FRONTEND_CARD_RESOURCE_URL_ES5 = (
+    f"{FRONTEND_CARD_STATIC_URL}?v={FRONTEND_CARD_CACHE_TOKEN}&mode=legacy"
 )
 DATA_FRONTEND_STATIC_REGISTERED = "_frontend_static_registered"
 
@@ -91,4 +94,6 @@ async def _async_register_frontend_card(hass: HomeAssistant) -> None:
         return
 
     # Intentionally call each setup to keep resource registration fresh after updates/reloads.
+    # Register both module and legacy paths for broader frontend compatibility.
     add_extra_js_url(hass, FRONTEND_CARD_RESOURCE_URL)
+    add_extra_js_url(hass, FRONTEND_CARD_RESOURCE_URL_ES5, es5=True)
