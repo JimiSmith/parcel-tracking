@@ -1,10 +1,7 @@
 class ParcelAppDeliveryCard extends HTMLElement {
   setConfig(config) {
-    if (!config || !config.entity) {
-      throw new Error("ParcelApp card requires an entity.");
-    }
-
     this._config = {
+      entity: "",
       events_limit: 5,
       show_expected: true,
       show_carrier: true,
@@ -42,6 +39,13 @@ class ParcelAppDeliveryCard extends HTMLElement {
 
   _render() {
     if (!this._hass || !this._config || !this._card) {
+      return;
+    }
+
+    if (!this._config.entity) {
+      this._card.innerHTML = this._renderError(
+        "Waiting for entity binding (use entity: this.entity_id with auto-entities)."
+      );
       return;
     }
 
