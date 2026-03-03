@@ -1,20 +1,29 @@
 class ParcelAppDeliveryCard extends HTMLElement {
   setConfig(config) {
-    this._config = {
-      entity: "",
-      events_limit: 5,
-      show_expected: true,
-      show_carrier: true,
-      collapsible_events: false,
-      layout: "hero",
-      show_decorations: true,
-      show_progress_rail: true,
-      show_route: true,
-      action: "more-info",
-      accent_color: "#63b8ff",
-      card_height: "",
-      ...config,
-    };
+    try {
+      this._config = {
+        entity: "",
+        events_limit: 5,
+        show_expected: true,
+        show_carrier: true,
+        collapsible_events: false,
+        layout: "hero",
+        show_decorations: true,
+        show_progress_rail: true,
+        show_route: true,
+        action: "more-info",
+        accent_color: "#63b8ff",
+        card_height: "",
+        ...(config || {}),
+      };
+    } catch (err) {
+      this._config = { entity: "" };
+      if (this._card) {
+        this._card.innerHTML = this._renderError(
+          `Invalid card configuration: ${this._toErrorText(err)}`
+        );
+      }
+    }
 
     if (!this._card) {
       this._card = document.createElement("ha-card");
@@ -30,7 +39,15 @@ class ParcelAppDeliveryCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    this._render();
+    try {
+      this._render();
+    } catch (err) {
+      if (this._card) {
+        this._card.innerHTML = this._renderError(
+          `Card render error: ${this._toErrorText(err)}`
+        );
+      }
+    }
   }
 
   getCardSize() {
@@ -676,11 +693,29 @@ class ParcelAppDeliveryCard extends HTMLElement {
 
   _escapeHtml(value) {
     return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
+      .split("&")
+      .join("&amp;")
+      .split("<")
+      .join("&lt;")
+      .split(">")
+      .join("&gt;")
+      .split('"')
+      .join("&quot;")
+      .split("'")
+      .join("&#39;");
+  }
+
+  _toErrorText(err) {
+    if (!err) {
+      return "unknown error";
+    }
+    if (typeof err === "string") {
+      return err;
+    }
+    if (err instanceof Error) {
+      return err.message || err.name;
+    }
+    return String(err);
   }
 }
 
