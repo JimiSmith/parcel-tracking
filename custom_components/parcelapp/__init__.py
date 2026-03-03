@@ -15,7 +15,12 @@ from .coordinator import ParcelAppDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 FRONTEND_CARD_FILE = "parcelapp-delivery-card.js"
-FRONTEND_CARD_URL = f"/parcelapp_frontend/{FRONTEND_CARD_FILE}"
+FRONTEND_CARD_STATIC_URL = f"/parcelapp_frontend/{FRONTEND_CARD_FILE}"
+# Bump this token whenever frontend card behavior changes to force browser refresh.
+FRONTEND_CARD_CACHE_TOKEN = "20260303"
+FRONTEND_CARD_RESOURCE_URL = (
+    f"{FRONTEND_CARD_STATIC_URL}?v={FRONTEND_CARD_CACHE_TOKEN}"
+)
 DATA_FRONTEND_REGISTERED = "_frontend_registered"
 
 
@@ -70,10 +75,10 @@ async def _async_register_frontend_card(hass: HomeAssistant) -> None:
 
     if hasattr(hass.http, "async_register_static_paths") and StaticPathConfig is not None:
         await hass.http.async_register_static_paths(
-            [StaticPathConfig(FRONTEND_CARD_URL, str(card_path), False)]
+            [StaticPathConfig(FRONTEND_CARD_STATIC_URL, str(card_path), False)]
         )
     elif hasattr(hass.http, "register_static_path"):
-        hass.http.register_static_path(FRONTEND_CARD_URL, str(card_path), False)
+        hass.http.register_static_path(FRONTEND_CARD_STATIC_URL, str(card_path), False)
     else:
         return
 
@@ -82,5 +87,5 @@ async def _async_register_frontend_card(hass: HomeAssistant) -> None:
     except ImportError:
         return
 
-    add_extra_js_url(hass, FRONTEND_CARD_URL)
+    add_extra_js_url(hass, FRONTEND_CARD_RESOURCE_URL)
     domain_data[DATA_FRONTEND_REGISTERED] = True
